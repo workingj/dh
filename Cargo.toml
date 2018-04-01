@@ -1,0 +1,10 @@
+[package]
+name = "hlp"
+version = "0.1.0"
+authors = ["workingj <workingj@outlook.de>"]
+
+[dependencies]
+
+[profile.release]
+panic = 'abort'
+lto = true
