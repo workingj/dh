@@ -5,10 +5,10 @@ A small commandline tool for showing simple custom help files or notes.
 
 ### build
 
-```cargo build --release```
+```$ cargo build --release```
 
 Register hlp.exe in the environment variables, so you can run it from the commanndline with  
-```hlp [argumetn]```
+```$ hlp [argumetn]```
 
 ### needed files
 
@@ -37,8 +37,6 @@ Directory:
 ```
 Usage:
 
-```
-hlp git
-```
+```$ hlp git```
 
 Will show the contents of the git.help file.
