@@ -32,7 +32,7 @@ Directory:
 └── hlp
     ├── cargo.hlp
     ├── git.hlp
-    ├── help.hlp (needed)
+    ├── help.hlp
     └── hlp.exe
 ```
 Usage:
