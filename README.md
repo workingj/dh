@@ -8,7 +8,7 @@ A small commandline tool for showing simple custom help files or notes.
 ```$ cargo build --release```
 
 Register hlp.exe in the environment variables, so you can run it from the commanndline with  
-```$ hlp [argumetn]```
+```$ hlp [argument]```
 
 ### needed files
 
