@@ -1,5 +1,5 @@
 use std::env;
-use std::process;
+use std::process::exit;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -63,7 +63,7 @@ fn get_hlp_entries(config_file_path: &str) -> Vec<String> {
 
             // force to restart
             println!("File has now been created");
-            process::exit(0);
+            exit(0);
         }
 
         Ok(data) => data,
