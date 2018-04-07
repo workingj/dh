@@ -1,4 +1,5 @@
-# hlp
+# dh (display help)
+
 A small commandline tool for showing simple custom help files or notes.
 
 ## Usage
@@ -29,14 +30,14 @@ Help files must be named like the command in the config file and can be anny sim
 
 Directory:
 ```
-└── hlp
+└── myhelp
     ├── cargo.hlp
     ├── git.hlp
     ├── help.hlp
-    └── hlp.exe
+    └── dh.exe
 ```
 Usage:
 
-```$ hlp git```
+```$ dh git```
 
-Will show the contents of the git.help file.
+Will show the contents of the git.hlp file.
