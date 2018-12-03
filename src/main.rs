@@ -1,3 +1,5 @@
+// dh - Display Help
+
 use std::env;
 use std::process::exit;
 use std::fs::File;
@@ -69,7 +71,7 @@ fn get_hlp_entries(config_file_path: &str) -> Vec<String> {
         Ok(data) => data,
     };
 
-    // reading the config file to get list with possible commands
+    // reading the config file to get the list with possible commands
     let mut content = String::new();
     match file.read_to_string(&mut content) {
         Err(why) => panic!("Error: Could not read {}:\n {}", CONFIG_FILE, why),
