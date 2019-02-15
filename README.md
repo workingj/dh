@@ -1,5 +1,9 @@
 # dh (display help)
 
+![MIT licensed][license-image]
+
+[license-image]: https://img.shields.io/github/license/workingj/dh.svg
+
 A small commandline tool for showing simple custom help files or notes.
 
 ## Usage
@@ -8,7 +12,7 @@ A small commandline tool for showing simple custom help files or notes.
 
 ```$ cargo build --release```
 
-Register hlp.exe in the environment variables, so you can run it from the commanndline with  
+Register hlp.exe in the environment variables, so you can run it from the commandline with  
 ```$ hlp [argument]```
 
 ### needed files
