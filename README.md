@@ -5,6 +5,7 @@
 [license-image]: https://img.shields.io/github/license/workingj/dh.svg
 
 A small commandline tool for showing simple custom help files or notes.
+Waits for retrun key after 24 lines and shows the next 24 lines.
 
 ## Usage
 
@@ -12,14 +13,14 @@ A small commandline tool for showing simple custom help files or notes.
 
 ```$ cargo build --release```
 
-Register hlp.exe in the environment variables, so you can run it from the commandline with  
-```$ hlp [argument]```
+Register dh in the environment variables, so you can run it from the commandline with  
+```$ dh [argument]```
 
 ### needed files
 
 Needed config file must be named and look like this:
 
-help.hlp
+help.toml
 
 ```
 Command  Description
@@ -34,14 +35,14 @@ Help files must be named like the command in the config file and can be anny sim
 
 Directory:
 ```
-└── myhelp
-    ├── cargo.hlp
-    ├── git.hlp
-    ├── help.hlp
-    └── dh.exe
+└── dh
+    ├── cargo.toml
+    ├── git.toml
+    ├── help.toml
+    └── dh.exe (bin)
 ```
 Usage:
 
 ```$ dh git```
 
-Will show the contents of the git.hlp file.
+Will show the contents of the git.toml file.

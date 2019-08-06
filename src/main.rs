@@ -50,7 +50,7 @@ fn main() -> Result<(), std::io::Error> {
     for line in file_lines.lines() {
         match line {
             Ok(line) => {
-                if line.contains("#") {
+                if line.contains('#') {
                     stdout.set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
                     writeln!(&mut stdout, "{}", line)?;
                 } else {
@@ -60,7 +60,7 @@ fn main() -> Result<(), std::io::Error> {
                 counter += 1;
                 if counter == 24 {
                     stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
-                    write!(&mut stdout, "  -----------------------------------------------------------------------------\\/\n")?;
+                    writeln!(&mut stdout, "  -----------------------------------------------------------------------------\\/")?;
                     std::io::stdin().read_line(&mut input)?;
                     counter = 0;
                 }
