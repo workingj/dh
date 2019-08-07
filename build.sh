@@ -1,3 +1,3 @@
 #!/bin/bash
 cargo b --release
-cp ./target/release/dh ~/.jbtools/dh/
+cp $CARGO_TARGET_DIR/release/dh ~/.jbtools/dh/

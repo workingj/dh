@@ -10,9 +10,9 @@ use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 #[allow(dead_code)]
-const CONFIG_FILE: &'static str = "help.toml";
+const CONFIG_FILE: &str = "help.toml";
 #[allow(dead_code)]
-const HELP_FILE_TEXT: &'static str = "fromGetHelpEntries__ Command  Description\n\
+const HELP_FILE_TEXT: &str = "fromGetHelpEntries__ Command  Description\n\
                                       help    this file!\n\
                                       test    Test\n";
 
@@ -34,11 +34,9 @@ fn main() -> Result<(), std::io::Error> {
     let mut file_path = current_path.clone();
     let mut file_name = PathBuf::from(&args[1]);
 
-    if file_name.extension() == None {
+    if file_name.extension() == None || file_name.extension().unwrap() != std::ffi::OsString::from("toml").as_os_str() {
         file_name.set_extension("toml");
-    } else if file_name.extension() != Some(&std::ffi::OsString::from("toml").as_os_str()) {
-        file_name.set_extension("toml");
-    }
+    } 
     file_path.push(file_name);
 
     let file = File::open(file_path)?;
@@ -47,7 +45,7 @@ fn main() -> Result<(), std::io::Error> {
 
     let mut input = String::new();
 
-    for line in file_lines.lines() {
+    for line in file_lines.lines()   {
         match line {
             Ok(line) => {
                 if line.contains('#') {
