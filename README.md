@@ -16,34 +16,7 @@ Waits for retrun key after 24 lines and shows the next 24 lines.
 Register dh in the environment variables, so you can run it from the commandline with  
 ```$ dh [argument]```
 
-### needed files
-
-Needed config file must be named and look like this:
-
-help.toml
-
-```text
-Command  Description
-help    this file!
-test    Test...
-```
-
-If the help file doesn't exist, it will be created automaticly.  
-Help files must be named like the command in the config file and can be anny simple plain text.
-
-### Example
-
-Directory:
-
-```text
-└── dh
-    ├── cargo.toml
-    ├── git.toml
-    ├── help.toml
-    └── dh.exe (bin)
-```
-
-Usage:
+### Usage:
 
 ```$ dh git```
 
