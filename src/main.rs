@@ -9,8 +9,7 @@ use std::process::exit;
 use std::io::{Result, Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
-const HELP_FILE_TEXT: &str =
-    r#"###--------------------------------DH-HELP-----------------------------------###
+const HELP_FILE_TEXT: &str = r#"###--------------------------------DH-HELP-----------------------------------###
 Create your helpfiles in the root directory of dh or,
 set a location with the environment var 'DH_LIBRARY'
 and put your helpfiles there. 
@@ -75,12 +74,9 @@ fn main() -> Result<()> {
             }
         }
         Err(var_err) => {
-            match var_err {
-                env::VarError::NotUnicode(_) => {
-                    eprintln!("ENV VAR ERROR: Not Unicode -> {:?}", var_err)
-                }
-                _ => (), // ignore NotPresent case
-            };
+            if let env::VarError::NotUnicode(_) = var_err {
+                eprintln!("ENV VAR ERROR: Not Unicode -> {:?}", var_err)
+            }; 
             current_path = PathBuf::from(env::current_exe()?.parent().unwrap());
         }
     }
@@ -93,12 +89,11 @@ fn main() -> Result<()> {
 
     // Handel no file entry case:
     // Write HELP_FILE_TEXT to an newly created help file.
-    if entries.len() == 0 || entries[0].file_name().into_string().unwrap() == "dh" {
+    if entries.is_empty() || entries[0].file_name().into_string().unwrap() == "dh" {
         let mut help_file_path = current_path.clone();
         help_file_path.push("help.toml");
         let mut help_file = File::create(help_file_path)?;
-        help_file.write(HELP_FILE_TEXT.as_bytes())?;
-       
+        help_file.write_all(HELP_FILE_TEXT.as_bytes())?;
         // For creating the help file in an location
         file_name = PathBuf::from("help.toml");
     } else {
@@ -113,9 +108,9 @@ fn main() -> Result<()> {
 
     // Get user args
     // exit if no filename is given and
-    // if not in config mode 
+    // if not in config mode
     let args: Vec<String> = env::args().collect();
-    if args.len() == 1 &&  file_name.display().to_string() != "help.toml" {
+    if args.len() == 1 && file_name.display().to_string() != "help.toml" {
         color_the_output_stream(&mut stderr, Color::Yellow)?;
         writeln!(&mut stderr, "No Arguments found!\nTry one of these:")?;
         color_the_output_stream(&mut stderr, Color::White)?;
