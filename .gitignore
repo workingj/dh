@@ -1,5 +1,5 @@
 
 /target/
 **/*.rs.bk
-build.sh
+# build.sh
 README.html

@@ -52,9 +52,9 @@ fn print_existing_helpfiles(entries: Vec<DirEntry>) -> Result<()> {
         }
         if filename.contains(".toml") {
             filename = filename[0..filename.len() - 5].to_string();
-            println!("{}", filename);
+            println!("    {}", filename);
         } else {
-            println!("{}", filename);
+            println!("    {}", filename);
         }
     }
 
@@ -65,6 +65,7 @@ fn main() -> Result<()> {
     // Configure output streams for colored output
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
     let mut stderr = StandardStream::stderr(ColorChoice::Always);
+    color_the_output_stream(&mut stderr, Color::Red)?;
 
     // check for environment var and set path
     let mut current_path: PathBuf = PathBuf::new();
@@ -76,18 +77,18 @@ fn main() -> Result<()> {
             if path.is_dir() {
                 current_path = path;
             } else {
-                color_the_output_stream(&mut stderr, Color::Red)?;
-                eprintln!(
+                writeln!(
+                    &mut stdout,
                     "Error: Environment Variable '{}' not set correctly!",
                     DH_LIBRARY
-                );
+                )?;
                 std::mem::drop(current_path);
                 exit(0);
             }
         }
         Err(var_err) => {
             if let env::VarError::NotUnicode(_) = var_err {
-                eprintln!("ENV VAR ERROR: Not Unicode -> {:?}", var_err)
+                writeln!(&mut stdout, "ENV VAR ERROR: Not Unicode -> {:?}", var_err)?
             };
             current_path = PathBuf::from(env::current_exe()?.parent().unwrap());
         }
@@ -123,9 +124,9 @@ fn main() -> Result<()> {
     // if not in config mode
     let args: Vec<String> = env::args().collect();
     if args.len() == 1 && file_name.display().to_string() != "help.toml" {
-        color_the_output_stream(&mut stderr, Color::Yellow)?;
-        writeln!(&mut stderr, "No Arguments found!\nTry one of these:")?;
-        color_the_output_stream(&mut stderr, Color::White)?;
+        color_the_output_stream(&mut stdout, Color::Yellow)?;
+        writeln!(&mut stdout, "No Arguments found!\nTry one of these:")?;
+        color_the_output_stream(&mut stdout, Color::White)?;
         print_existing_helpfiles(entries)?;
         exit(1);
     }
@@ -155,8 +156,27 @@ fn main() -> Result<()> {
     let file = match File::open(&current_path) {
         Ok(f) => f,
         Err(_) => {
-            color_the_output_stream(&mut stdout, Color::Red)?;
-            eprintln!("Error: Could not open file: {}", &current_path.display());
+            writeln!(
+                &mut stderr,
+                "Error: Could not open file: {}",
+                &current_path.display()
+            )?;
+
+            // Printing Possible Hit
+            let mut filename: String;
+            color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
+            writeln!(&mut stdout, "Did you mean?")?;
+            color_the_output_stream(&mut stdout, Color::White)?;
+            for entry in entries {
+                filename = entry.file_name().into_string().unwrap();
+                if filename.contains(&args[1]) {
+                    writeln!(
+                        &mut stdout,
+                        "    {}",
+                        filename.strip_suffix(".toml").unwrap()
+                    )?;
+                }
+            }
             exit(0);
         }
     };
@@ -169,23 +189,29 @@ fn main() -> Result<()> {
     for line in file_lines.lines() {
         match line {
             Ok(line) => {
-                if line.chars().nth(0) == Some('#') && line.chars().nth(2) == Some('#') { // Green Header and Footer
+                if line.starts_with('#') && line.chars().nth(2) == Some('#') {
+                    // Dark Orange Header and Footer
                     color_the_output_stream(&mut stdout, Color::Ansi256(208))?;
                     writeln!(&mut stdout, "{}", line)?;
-                }
-                else if line.chars().nth(0) == Some('#') && line.chars().nth(1) == Some('#') && line.chars().nth(2) != Some('#') { // Lightblue Subheader
+                } else if line.starts_with('#')
+                    && line.chars().nth(1) == Some('#')
+                    && line.chars().nth(2) != Some('#')
+                {
+                    // Lightblue Subheader
                     color_the_output_stream(&mut stdout, Color::Ansi256(33))?;
                     writeln!(&mut stdout, "    {}", line)?;
-                }
-                else if line.chars().nth(0) == Some('#') && line.chars().nth(1) != Some('#') { // Orange Headline
+                } else if line.starts_with('#') && line.chars().nth(1) != Some('#') {
+                    // Yellow Headline
                     color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
                     writeln!(&mut stdout, "{}", line)?;
-                } else { // Normal output line
-                    color_the_output_stream(&mut stderr, Color::White)?;
+                } else {
+                    // Normal output line
+                    color_the_output_stream(&mut stdout, Color::White)?;
                     println!("    {}", line);
                 }
                 counter += 1;
-                if counter == 32 { // Do a wait after 32 lines.
+                if counter == 32 {
+                    // Do a wait after 32 lines.
                     std::io::stdin().read_line(&mut input)?;
                     counter = 0;
                 }
@@ -196,7 +222,6 @@ fn main() -> Result<()> {
         }
     }
     // Reset Line-Color
-    color_the_output_stream(&mut stderr, Color::White)?;
-
+    color_the_output_stream(&mut stdout, Color::White)?;
     Ok(())
 }
