@@ -10,15 +10,27 @@ use std::io::{Result, Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const HELP_FILE_TEXT: &str = r#"###--------------------------------DH-HELP-----------------------------------###
+# INSTRUCTION
 Create your helpfiles in the root directory of dh or,
 set a location with the environment var 'DH_LIBRARY'
-and put your helpfiles there. 
-Use '.toml' extension and start header with '#' for highlighting. 
+and put your helpfiles there.
+## Files
+Use '.toml' for File extension.
 
-# EXAMPLE:
+# USAGE EXAMPLE:
 Filename      Command       Output
 help.toml     $ dh help     this file!
-yours.toml    $ dh yours    what ever you had jotted down."#;
+yours.toml    $ dh yours    what ever you have jotted down.
+              $ dh          Lists all Helpfiles within the 'DH_LIBRARY'-Location
+
+# HIGHLIGHTING:
+## Lines that start with '#','##','###...' will be highlighted
+'#'   Yellow
+'##'  Blue
+'###' Orange
+
+######--------------------------------------------------------------------######
+"#;
 
 /// Name for Environment Variable
 const DH_LIBRARY: &str = "DH_LIBRARY";
@@ -76,7 +88,7 @@ fn main() -> Result<()> {
         Err(var_err) => {
             if let env::VarError::NotUnicode(_) = var_err {
                 eprintln!("ENV VAR ERROR: Not Unicode -> {:?}", var_err)
-            }; 
+            };
             current_path = PathBuf::from(env::current_exe()?.parent().unwrap());
         }
     }
@@ -148,6 +160,7 @@ fn main() -> Result<()> {
             exit(0);
         }
     };
+    // Read the Contents of the File
     let file_lines = std::io::BufReader::new(file);
     let mut counter = 0_usize;
     let mut input = String::new();
@@ -156,18 +169,23 @@ fn main() -> Result<()> {
     for line in file_lines.lines() {
         match line {
             Ok(line) => {
-                if line.chars().nth(0) == Some('#') {
-                    color_the_output_stream(&mut stdout, Color::Yellow)?;
+                if line.chars().nth(0) == Some('#') && line.chars().nth(2) == Some('#') { // Green Header and Footer
+                    color_the_output_stream(&mut stdout, Color::Ansi256(208))?;
                     writeln!(&mut stdout, "{}", line)?;
-                } else {
+                }
+                else if line.chars().nth(0) == Some('#') && line.chars().nth(1) == Some('#') && line.chars().nth(2) != Some('#') { // Lightblue Subheader
+                    color_the_output_stream(&mut stdout, Color::Ansi256(33))?;
+                    writeln!(&mut stdout, "    {}", line)?;
+                }
+                else if line.chars().nth(0) == Some('#') && line.chars().nth(1) != Some('#') { // Orange Headline
+                    color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
+                    writeln!(&mut stdout, "{}", line)?;
+                } else { // Normal output line
                     color_the_output_stream(&mut stderr, Color::White)?;
-                    println!("{}", line);
+                    println!("    {}", line);
                 }
                 counter += 1;
-                // Do a wait after 32 lines.
-                if counter == 32 {
-                    color_the_output_stream(&mut stdout, Color::Ansi256(8))?; // Gray
-                    writeln!(&mut stdout, "{:─^77}", "▾▾▾")?;
+                if counter == 32 { // Do a wait after 32 lines.
                     std::io::stdin().read_line(&mut input)?;
                     counter = 0;
                 }
@@ -177,6 +195,8 @@ fn main() -> Result<()> {
             }
         }
     }
+    // Reset Line-Color
+    color_the_output_stream(&mut stderr, Color::White)?;
 
     Ok(())
 }
