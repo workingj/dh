@@ -101,8 +101,10 @@ fn main() -> Result<()> {
     }
 
     // Handel no file entry case:
+    let name_test = entries[0].file_name().into_string().unwrap();
+
     // Write HELP_FILE_TEXT to an newly created help file.
-    if entries.is_empty() || entries[0].file_name().into_string().unwrap() == "dh" {
+    if entries.is_empty() || name_test == "dh" || name_test == "-h" || name_test == "--help" {
         let mut help_file_path = current_path.clone();
         help_file_path.push("help.toml");
         let mut help_file = File::create(help_file_path)?;
@@ -131,7 +133,7 @@ fn main() -> Result<()> {
         exit(1);
     }
 
-    // Passing help.toml through for congif and help purpose.
+    // Passing help.toml through for config and help purpose.
     if file_name.display().to_string() != "help.toml" {
         file_name = PathBuf::from(&args[1]);
     }
@@ -142,7 +144,7 @@ fn main() -> Result<()> {
             .expect("Error reading existing helpfiles!")
             .as_bytes();
         if name_test == b"dh" || name_test == b"-h" || name_test == b"--help" {
-            println!("{}", HELP_FILE_TEXT);
+             file_name = PathBuf::from("dh.toml");
         }
     }
 
@@ -198,12 +200,13 @@ fn main() -> Result<()> {
                     && line.chars().nth(2) != Some('#')
                 {
                     // Lightblue Subheader
+                    // TODO:
                     color_the_output_stream(&mut stdout, Color::Ansi256(33))?;
-                    writeln!(&mut stdout, "    {}", line)?;
+                    writeln!(&mut stdout, "  {}", String::from(&line[2..]).trim_start())?;
                 } else if line.starts_with('#') && line.chars().nth(1) != Some('#') {
                     // Yellow Headline
                     color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
-                    writeln!(&mut stdout, "{}", line)?;
+                    writeln!(&mut stdout, "{}", String::from(&line[1..]).trim_start())?;
                 } else {
                     // Normal output line
                     color_the_output_stream(&mut stdout, Color::White)?;
