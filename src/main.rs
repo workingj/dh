@@ -144,7 +144,7 @@ fn main() -> Result<()> {
             .expect("Error reading existing helpfiles!")
             .as_bytes();
         if name_test == b"dh" || name_test == b"-h" || name_test == b"--help" {
-             file_name = PathBuf::from("dh.toml");
+            file_name = PathBuf::from("dh.toml");
         }
     }
 
@@ -191,24 +191,30 @@ fn main() -> Result<()> {
     for line in file_lines.lines() {
         match line {
             Ok(line) => {
-                if line.starts_with('#') && line.chars().nth(2) == Some('#') {
-                    // Dark Orange Header and Footer
-                    color_the_output_stream(&mut stdout, Color::Ansi256(208))?;
+                // Green Header and Footer
+                if line.starts_with('#') && line.chars().nth(6) == Some('-') {
+                    color_the_output_stream(&mut stdout, Color::Ansi256(37))?;
                     writeln!(&mut stdout, "{}", line)?;
+                // Orange Highlighting (###)
+                } else if line.starts_with('#')
+                    && line.chars().nth(2) == Some('#')
+                    && line.chars().nth(3) != Some('-')
+                {
+                    color_the_output_stream(&mut stdout, Color::Ansi256(208))?;
+                    writeln!(&mut stdout, "  {}", String::from(&line[3..]).trim_start())?;
+                // Lightblue Subheader (##)
                 } else if line.starts_with('#')
                     && line.chars().nth(1) == Some('#')
                     && line.chars().nth(2) != Some('#')
                 {
-                    // Lightblue Subheader
-                    // TODO:
                     color_the_output_stream(&mut stdout, Color::Ansi256(33))?;
                     writeln!(&mut stdout, "  {}", String::from(&line[2..]).trim_start())?;
+                // Yellow HEADER (#)
                 } else if line.starts_with('#') && line.chars().nth(1) != Some('#') {
-                    // Yellow Headline
                     color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
-                    writeln!(&mut stdout, "{}", String::from(&line[1..]).trim_start())?;
+                    writeln!(&mut stdout, "{}", String::from(&line[2..]).trim_start())?;
+                // Normal output line
                 } else {
-                    // Normal output line
                     color_the_output_stream(&mut stdout, Color::White)?;
                     println!("    {}", line);
                 }
