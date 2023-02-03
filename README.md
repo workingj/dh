@@ -37,7 +37,12 @@ yours.toml    $ dh yours    what ever you have jotted down.
 
 ### HIGHLIGHTING
 
-__Lines that start with '#','##','###...' will be highlighted__  
-'#'   <span style="color:yellow">__Yellow__</span>  
-'##'  <span style="color:blue">__Blue__</span>  
-'###' <span style="color:orange">__Orange__</span>  
+```text
+__Lines that start with '#','##','###, *, //' will be highlighted__
+'# '   HEADER 1   in Green
+'## '  Header 2  in Blue
+'### ' Header 3 in Turkoise
+'$ ' Commad Line  in Oragen
+'// '  Comment   in Slate Blue
+'* ' Bullet Point in Chartreuse
+```
