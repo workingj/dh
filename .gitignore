@@ -3,3 +3,4 @@
 **/*.rs.bk
 # build.sh
 README.html
+build.sh

@@ -10,6 +10,7 @@ use std::io::{Result, Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const HELP_FILE_TEXT: &str = r#"###--------------------------------DH-HELP-----------------------------------###
+
 # INSTRUCTION
 Create your helpfiles in the root directory of dh or,
 set a location with the environment var 'DH_LIBRARY'
@@ -24,10 +25,13 @@ yours.toml    $ dh yours    what ever you have jotted down.
               $ dh          Lists all Helpfiles within the 'DH_LIBRARY'-Location
 
 # HIGHLIGHTING:
-## Lines that start with '#','##','###...' will be highlighted
-'#'   Yellow
-'##'  Blue
-'###' Orange
+## Lines that start with '#','##','###, *, //' will be highlighted
+# '# '   HEADER 1   in Green
+## '## '  Header 2  in Blue
+### '### ' Header 3 in Turkoise
+$ '$ ' Commad Line  in Oragen
+// '// '  Comment   in Slate Blue
+* '* ' Bullet Point in Chartreuse
 
 ######--------------------------------------------------------------------######
 "#;
@@ -52,9 +56,9 @@ fn print_existing_helpfiles(entries: Vec<DirEntry>) -> Result<()> {
         }
         if filename.contains(".toml") {
             filename = filename[0..filename.len() - 5].to_string();
-            println!("    {}", filename);
+            println!("    {filename}");
         } else {
-            println!("    {}", filename);
+            println!("    {filename}");
         }
     }
 
@@ -79,8 +83,7 @@ fn main() -> Result<()> {
             } else {
                 writeln!(
                     &mut stdout,
-                    "Error: Environment Variable '{}' not set correctly!",
-                    DH_LIBRARY
+                    "Error: Environment Variable '{DH_LIBRARY}' not set correctly!"
                 )?;
                 std::mem::drop(current_path);
                 exit(0);
@@ -88,7 +91,7 @@ fn main() -> Result<()> {
         }
         Err(var_err) => {
             if let env::VarError::NotUnicode(_) = var_err {
-                writeln!(&mut stdout, "ENV VAR ERROR: Not Unicode -> {:?}", var_err)?
+                writeln!(&mut stdout, "ENV VAR ERROR: Not Unicode -> {var_err:?}")?
             };
             current_path = PathBuf::from(env::current_exe()?.parent().unwrap());
         }
@@ -117,7 +120,7 @@ fn main() -> Result<()> {
             a.file_name()
                 .to_str()
                 .unwrap()
-                .cmp(&b.file_name().to_str().unwrap())
+                .cmp(b.file_name().to_str().unwrap())
         });
     }
 
@@ -149,7 +152,7 @@ fn main() -> Result<()> {
     }
 
     // Check for the right file extension
-    if file_name.extension() == None {
+    if file_name.extension().is_none() {
         file_name.set_extension("toml");
     }
 
@@ -191,42 +194,64 @@ fn main() -> Result<()> {
     for line in file_lines.lines() {
         match line {
             Ok(line) => {
-                // Green Header and Footer
-                if line.starts_with('#') && line.chars().nth(6) == Some('-') {
-                    color_the_output_stream(&mut stdout, Color::Ansi256(37))?;
-                    writeln!(&mut stdout, "{}", line)?;
-                // Orange Highlighting (###)
-                } else if line.starts_with('#')
-                    && line.chars().nth(2) == Some('#')
-                    && line.chars().nth(3) != Some('-')
-                {
-                    color_the_output_stream(&mut stdout, Color::Ansi256(208))?;
-                    writeln!(&mut stdout, "  {}", String::from(&line[3..]).trim_start())?;
-                // Lightblue Subheader (##)
-                } else if line.starts_with('#')
-                    && line.chars().nth(1) == Some('#')
-                    && line.chars().nth(2) != Some('#')
-                {
-                    color_the_output_stream(&mut stdout, Color::Ansi256(33))?;
-                    writeln!(&mut stdout, "  {}", String::from(&line[2..]).trim_start())?;
-                // Yellow HEADER (#)
-                } else if line.starts_with('#') && line.chars().nth(1) != Some('#') {
-                    color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
-                    writeln!(&mut stdout, "{}", String::from(&line[2..]).trim_start())?;
-                // Normal output line
-                } else {
-                    color_the_output_stream(&mut stdout, Color::White)?;
-                    println!("    {}", line);
+                match line.split_whitespace().next() {
+                    Some(linetype) => {
+                        // Header 1 Line
+                        if linetype == "#" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(220))?;
+                            writeln!(
+                                &mut stdout,
+                                "{}",
+                                String::from(&line[1..]).trim_start().to_uppercase()
+                            )?;
+                        // Header 2 Line
+                        } else if linetype == "##" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(32))?;
+                            writeln!(&mut stdout, " {}", String::from(&line[2..]).trim_start())?;
+                        // Header 3 Line
+                        } else if linetype == "###" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(30))?;
+                            writeln!(&mut stdout, " {}", String::from(&line[3..]).trim_start())?;
+                        // Command Line
+                        } else if linetype == "$" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(214))?;
+                            writeln!(
+                                &mut stdout,
+                                "        {}",
+                                String::from(&line[1..]).trim_start()
+                            )?;
+                        // Bullet Point Line
+                        } else if linetype == "*" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(70))?;
+                            writeln!(&mut stdout, "    {}", String::from(&line).trim_start())?;
+                        // Comment Line
+                        } else if linetype == "//" {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(62))?;
+                            writeln!(&mut stdout, "    {}", String::from(&line[2..]).trim_start())?;
+                        // File OPEN and CLOSE Segment
+                        } else if line.starts_with('#') && line.chars().nth(6) == Some('-') {
+                            color_the_output_stream(&mut stdout, Color::Ansi256(66))?;
+                            writeln!(&mut stdout, "{}", line.to_uppercase())?;
+                        // Normal Line
+                        } else {
+                            color_the_output_stream(&mut stdout, Color::White)?;
+                            println!("    {line}");
+                        }
+                    }
+                    None => {
+                        println!();
+                    }
                 }
+
                 counter += 1;
-                if counter == 32 {
-                    // Do a wait after 32 lines.
+                if counter == 48 {
+                    // Do a wait after 48 lines.
                     std::io::stdin().read_line(&mut input)?;
                     counter = 0;
                 }
             }
             Err(err) => {
-                writeln!(&mut stderr, "{:?}", err)?;
+                writeln!(&mut stderr, "{err:?}")?;
             }
         }
     }
