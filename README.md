@@ -37,8 +37,9 @@ yours.toml    $ dh yours    what ever you have jotted down.
 
 ### HIGHLIGHTING
 
-```text
 __Lines that start with '#','##','###, *, //' will be highlighted__
+
+```text
 '# '   HEADER 1   in Green
 '## '  Header 2  in Blue
 '### ' Header 3 in Turkoise
